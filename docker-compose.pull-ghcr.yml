@@ -2,6 +2,7 @@ services:
   sigmarulegen:
     image: ghcr.io/05t3/sigmarulegen:latest
     ports:
-      - "3000:80"
+      - "${PORT}:${PORT}" # uses PORT from .env
     container_name: sigmarulegen
     restart: unless-stopped
+    command: npm run start

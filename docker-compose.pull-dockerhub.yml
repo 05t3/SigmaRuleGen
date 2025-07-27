@@ -2,6 +2,6 @@ services:
   sigmarulegen:
     image: yourdockerhubuser/sigmarulegen:latest
     ports:
-      - "3000:80"
+      - "${PORT}:${PORT}" # uses PORT from .env
     container_name: sigmarulegen
     restart: unless-stopped

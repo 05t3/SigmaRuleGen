@@ -1,8 +1,12 @@
 services:
-  sigmarulegen:
+  app:
     build:
       context: .
-      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
-      - "3000:80"
+      - "${PORT}:${PORT}" # uses PORT from .env
+    restart: unless-stopped
     container_name: sigmarulegen
+    command: npm run start # If production
+    # command: npm run dev # If development
