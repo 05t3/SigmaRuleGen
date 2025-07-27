@@ -8,5 +8,3 @@ services:
       - "${PORT}:${PORT}" # uses PORT from .env
     restart: unless-stopped
     container_name: sigmarulegen
-    command: npm run start # If production
-    # command: npm run dev # If development
