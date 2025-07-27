@@ -1,0 +1,8 @@
+services:
+  sigma-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    container_name: sigma-ui

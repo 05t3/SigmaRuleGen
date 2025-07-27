@@ -1,0 +1,7 @@
+services:
+  sigma-ui:
+    image: ghcr.io/<your-github-username>/sigmarulegen:latest
+    ports:
+      - "3000:80"
+    container_name: sigma-ui
+    restart: unless-stopped
