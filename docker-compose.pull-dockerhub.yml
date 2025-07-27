@@ -1,7 +1,7 @@
 services:
-  sigma-ui:
+  sigmarulegen:
     image: yourdockerhubuser/sigmarulegen:latest
     ports:
       - "3000:80"
-    container_name: sigma-ui
+    container_name: sigmarulegen
     restart: unless-stopped
