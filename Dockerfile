@@ -5,7 +5,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Set environment variables
-ENV NODE_ENV=${NODE_ENV}
+ENV NODE_ENV=development
 ENV TZ=Africa/Nairobi
 
 # Copy package files & install dependencies
