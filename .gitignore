@@ -1,7 +1,7 @@
 # dependencies
 node_modules/
 attached_assets/
-.env
+# .env
 .env.local
 .env.*.local
 

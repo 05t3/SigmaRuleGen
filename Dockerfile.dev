@@ -20,5 +20,4 @@ COPY . .
 EXPOSE 3000
 
 # Command can be overridden with CMD in docker-compose
-RUN npm ci && npm run build
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
