@@ -3,7 +3,7 @@ name: Build and Push Docker Image to GHCR using VERSION file
 on:
   push:
     branches:
-      - main
+      - main  # Adjust this to your deployment branch if needed
 
 jobs:
   build-and-push:
@@ -31,11 +31,17 @@ jobs:
         id: get_version
         run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
 
+      - name: Set lowercase image name
+        id: image
+        run: |
+          IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image to GHCR
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.version }}
-            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
+            ghcr.io/${{ steps.image.outputs.name }}:latest
