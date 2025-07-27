@@ -1,7 +1,9 @@
 services:
   sigmarulegen:
     image: yourdockerhubuser/sigmarulegen:latest
+    container_name: sigmarulegen
+    env_file:
+      - .env
     ports:
       - "${PORT}:${PORT}" # uses PORT from .env
-    container_name: sigmarulegen
     restart: unless-stopped
