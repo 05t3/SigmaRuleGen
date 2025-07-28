@@ -1,12 +1,10 @@
-name: Trivy Container Scanner
+name: Trivy Image Scanner
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-  schedule:
-    - cron: '0 4 * * 6'  # Every Saturday at 04:00
+  workflow_run:
+    workflows: ["Build and Push Docker Image to Docker Hub and GHCR using VERSION file"]  # ✅ updated
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -15,6 +13,7 @@ permissions:
 
 jobs:
   trivy-scan:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -31,19 +30,34 @@ jobs:
           IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Pull Docker image
+      - name: Pull GHCR image
+        run: docker pull ghcr.io/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
+
+      - name: Pull Docker Hub image
         run: docker pull oste/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
 
-      - name: Scan image with Trivy
-        uses: aquasecurity/trivy-action@master  # ✅ Safe fallback; or tag a release version
+      - name: Scan GHCR image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
+          format: sarif
+          output: trivy-ghcr.sarif
+
+      - name: Scan Docker Hub image with Trivy
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: oste/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
-          format: 'sarif'
-          output: trivy-results.sarif
-          ignore-unfixed: true
+          format: sarif
+          output: trivy-dockerhub.sarif
 
-      - name: Upload SARIF to GitHub (Trivy)
+      - name: Upload GHCR scan SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-results.sarif
-          category: trivy-container-scan
+          sarif_file: trivy-ghcr.sarif
+          category: trivy-ghcr
+
+      - name: Upload Docker Hub scan SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-dockerhub.sarif
+          category: trivy-dockerhub

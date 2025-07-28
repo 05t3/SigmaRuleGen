@@ -1,6 +1,6 @@
 services:
   sigmarulegen:
-    image: yourdockerhubuser/sigmarulegen:1.0.2
+    image: yourdockerhubuser/sigmarulegen:1.0.0
     container_name: sigmarulegen
     env_file:
       - .env

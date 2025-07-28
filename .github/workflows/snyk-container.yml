@@ -14,12 +14,10 @@
 name: Snyk Container Scanner
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
-  schedule:
-    - cron: '35 19 * * 5'  # Every Friday at 19:35
+  workflow_run:
+    workflows: ["Build and Push Docker Image to Docker Hub and GHCR using VERSION file"]  # ✅ updated
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -27,7 +25,8 @@ permissions:
   actions: read
 
 jobs:
-  snyk:
+  snyk-scan:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -44,27 +43,47 @@ jobs:
           IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Pull Docker image
+      - name: Pull GHCR image
+        run: docker pull ghcr.io/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
+
+      - name: Pull Docker Hub image
         run: docker pull oste/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
 
-      - name: Run Snyk to check Docker image for vulnerabilities
+      - name: Scan GHCR image with Snyk
         continue-on-error: true
-        uses: snyk/actions/docker@0.4.0  # ✅ Correct version
+        uses: snyk/actions/docker@0.4.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ghcr.io/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
+          args: >
+            --file=Dockerfile
+            --sarif-file-output=snyk-ghcr.sarif
+            --exclude-base-image-vulns
+
+      - name: Scan Docker Hub image with Snyk
+        continue-on-error: true
+        uses: snyk/actions/docker@0.4.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: oste/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
           args: >
             --file=Dockerfile
-            --sarif-file-output=snyk.sarif
+            --sarif-file-output=snyk-dockerhub.sarif
             --exclude-base-image-vulns
 
-      - name: Upload SARIF to GitHub (Snyk)
+      - name: Upload GHCR scan SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: snyk.sarif
-          category: snyk-container-scan
+          sarif_file: snyk-ghcr.sarif
+          category: snyk-ghcr
 
+      - name: Upload Docker Hub scan SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-dockerhub.sarif
+          category: snyk-dockerhub
 
 
       # - name: Run Snyk to check Docker image for vulnerabilities
