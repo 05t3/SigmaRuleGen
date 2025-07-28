@@ -68,27 +68,25 @@ jobs:
         id: snyk-ghcr
         continue-on-error: true
         uses: snyk/actions/docker@0.4.0
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ghcr.io/${{ steps.image.outputs.repo_lower }}:${{ steps.get_version.outputs.version }}
-          args: >
-            --file=Dockerfile
-            --sarif-file-output=snyk-ghcr.sarif
-            --exclude-base-image-vulns
+          file: Dockerfile
+          sarif: snyk-ghcr.sarif
+          args: --exclude-base-image-vulns
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Scan Docker Hub image with Snyk
         id: snyk-dockerhub
         continue-on-error: true
         uses: snyk/actions/docker@0.4.0
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: oste/${{ steps.image.outputs.image_name }}:${{ steps.get_version.outputs.version }}
-          args: >
-            --file=Dockerfile
-            --sarif-file-output=snyk-dockerhub.sarif
-            --exclude-base-image-vulns
+          file: Dockerfile
+          sarif: snyk-dockerhub.sarif
+          args: --exclude-base-image-vulns
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload GHCR scan SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -101,6 +99,7 @@ jobs:
         with:
           sarif_file: snyk-dockerhub.sarif
           category: snyk-dockerhub
+
 
 
 
