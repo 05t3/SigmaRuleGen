@@ -11,15 +11,15 @@
 # issues, monitor images for newly disclosed vulnerabilities in Snyk and
 # fail PR checks for new vulnerabilities, see https://github.com/snyk/actions/
 
-name: Snyk Container
+name: Snyk Container Scanner
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '35 19 * * 5'
+    - cron: '35 19 * * 5'  # Every Friday at 19:35
 
 permissions:
   contents: read
@@ -44,9 +44,12 @@ jobs:
           IMAGE_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
+      - name: Pull Docker image
+        run: docker pull oste/${{ steps.image.outputs.name }}:${{ steps.get_version.outputs.version }}
+
       - name: Run Snyk to check Docker image for vulnerabilities
         continue-on-error: true
-        uses: snyk/actions/docker@v1
+        uses: snyk/actions/docker@0.4.0  # ✅ Correct version
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -61,6 +64,7 @@ jobs:
         with:
           sarif_file: snyk.sarif
           category: snyk-container-scan
+
 
 
       # - name: Run Snyk to check Docker image for vulnerabilities
