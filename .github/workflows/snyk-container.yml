@@ -69,33 +69,34 @@ jobs:
       - name: Install Snyk CLI
         run: npm install -g snyk
 
+      - name: Authenticate with Snyk
+        run: snyk auth "${{ secrets.SNYK_TOKEN }}"
+
       - name: Snyk GHCR Scan
         run: |
-          snyk auth "${{ secrets.SNYK_TOKEN }}"
           snyk container test "ghcr.io/${{ steps.image.outputs.repo_lower }}:${{ steps.version.outputs.version }}" \
             --file=Dockerfile \
             --sarif-file-output="snyk-ghcr.sarif" || echo "GHCR scan failed"
 
-      - name: Snyk DockerHub Scan
-        run: |
-          snyk auth "${{ secrets.SNYK_TOKEN }}"
-          snyk container test "oste/${{ steps.image.outputs.image_name }}:${{ steps.version.outputs.version }}" \
-            --file=Dockerfile \
-            --sarif-file-output="snyk-dockerhub.sarif" || echo "DockerHub scan failed"
-
-      - name: Upload SARIF (GHCR)
+      - name: Upload SARIF for GHCR
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk-ghcr.sarif
-          category: snyk-ghcr
+          category: snyk-ghcr-container
 
-      - name: Upload SARIF (DockerHub)
+      - name: Snyk DockerHub Scan
+        run: |
+          snyk container test "oste/${{ steps.image.outputs.image_name }}:${{ steps.version.outputs.version }}" \
+            --file=Dockerfile \
+            --sarif-file-output="snyk-dockerhub.sarif" || echo "DockerHub scan failed"
+
+      - name: Upload SARIF for DockerHub
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk-dockerhub.sarif
-          category: snyk-dockerhub
+          category: snyk-dockerhub-container
 
 
 
