@@ -1,107 +1,183 @@
-# Sigma Rule Generator Web Application
+# Sigma Rule Generator
 
-## Overview
+A user-friendly, open-source web application for creating Sigma rules to enhance cybersecurity detection. This tool provides an intuitive interface for generating Sigma rules with a live YAML preview, making it easy to craft detection rules without deep technical knowledge.
 
-This is a modern, responsive web application for generating Sigma rules through a structured user interface. The application provides a form-based approach to creating cybersecurity detection rules with live YAML preview functionality.
+## Features
 
-## User Preferences
+- **Simple Form Interface**: Easily input Sigma rule details through a structured form.
+- **Live YAML Preview**: See your rule in YAML format as you type.
+- **Validation**: Ensures rules are correctly formatted and valid.
+- **Export Options**: Download your Sigma rule as a YAML file or copy it to your clipboard.
+- **Responsive Design**: Works seamlessly on desktop and mobile devices.
+- **Dark/Light Theme**: Switch between themes for a comfortable user experience.
 
-Preferred communication style: Simple, everyday language.
+## Getting Started
 
-## System Architecture
+### Prerequisites
+- Docker (for containerized deployment)
+- Node.js and npm (for local development and production)
+- A modern web browser (e.g., Chrome, Firefox, Edge)
 
-The application follows a full-stack architecture with a clear separation between frontend and backend components:
+### Installation for Development
 
-### Frontend Architecture
-- **Framework**: React 18 with TypeScript
-- **Styling**: Tailwind CSS with shadcn/ui component library
-- **State Management**: React hooks with custom form management
-- **Routing**: Wouter for lightweight client-side routing
-- **Data Fetching**: TanStack Query (React Query) for server state management
-- **Build Tool**: Vite for fast development and optimized production builds
+To run the project locally for development:
 
-### Backend Architecture
-- **Runtime**: Node.js with Express.js framework
-- **Language**: TypeScript for type safety
-- **API Design**: RESTful API with /api prefix routing
-- **Development**: Hot module replacement via Vite integration
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/your-username/sigma-rule-generator.git
+   cd sigma-rule-generator
+   ```
 
-### Data Storage Strategy
-- **Database**: PostgreSQL with Drizzle ORM
-- **Schema Management**: Drizzle Kit for migrations
-- **Development Storage**: In-memory storage for rapid prototyping
-- **Connection**: Neon Database serverless for production
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-## Key Components
+3. **Start the Development Server**:
+   ```bash
+   npm run dev
+   ```
 
-### Form Management System
-The application uses a custom hook-based form management system that handles:
-- Dynamic field validation using Zod schemas
-- Real-time form state updates
-- Complex nested object management for detection blocks
-- UUID generation for rule identification
+4. **Access the Application**:
+   Open your browser and navigate to `http://localhost:3000`.
 
-### UI Component Library
-Built on shadcn/ui providing:
-- Consistent design system with CSS variables
-- Dark/light theme support
-- Accessible components using Radix UI primitives
-- Form controls optimized for Sigma rule fields
+### Installation for Production (Local)
 
-### YAML Generation Engine
-Custom utilities for converting form data to valid Sigma YAML:
-- Real-time preview updates
-- Proper YAML formatting and structure
-- Download functionality with automatic filename generation
-- Clipboard integration for easy sharing
+To run the project locally in production mode without Docker:
 
-## Data Flow
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/your-username/sigma-rule-generator.git
+   cd sigma-rule-generator
+   ```
 
-1. **User Input**: Form data is captured through controlled components
-2. **Validation**: Zod schemas validate data structure and types
-3. **State Management**: Custom hooks manage form state and updates
-4. **YAML Generation**: Utility functions convert form data to YAML
-5. **Preview Update**: Live preview updates as user types
-6. **Export Options**: Users can download or copy generated YAML
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-## External Dependencies
+3. **Build the Production Assets**:
+   Create an optimized production build:
+   ```bash
+   npm run build
+   ```
 
-### UI and Styling
-- **Radix UI**: Accessible component primitives
-- **Tailwind CSS**: Utility-first CSS framework
-- **Lucide React**: Icon library for consistent iconography
-- **React Syntax Highlighter**: YAML syntax highlighting
+4. **Start the Production Server**:
+   Serve the production build:
+   ```bash
+   npm run start
+   ```
 
-### Development Tools
-- **Drizzle**: Type-safe ORM for database operations
-- **Zod**: Runtime type validation and schema definition
-- **js-yaml**: YAML parsing and stringification
-- **date-fns**: Date manipulation utilities
+5. **Access the Application**:
+   Open your browser and navigate to `http://localhost:3000`.
 
-### Build and Development
-- **Vite**: Fast build tool with HMR support
-- **ESBuild**: Fast JavaScript bundler for production
-- **TypeScript**: Static type checking
-- **PostCSS**: CSS processing with Autoprefixer
+### Self-Hosting
 
-## Deployment Strategy
+The Sigma Rule Generator is designed for easy self-hosting using Docker, allowing you to deploy it on your own server or cloud provider. You can use pre-built images from Docker Hub or GitHub Container Registry, or build your own production-ready image locally.
 
-### Development Environment
-- Vite dev server with hot module replacement
-- In-memory storage for rapid iteration
-- TypeScript compilation checking
-- Replit integration with development banner
+#### Option 1: Using Pre-Built Docker Images
+1. **Pull the Image**:
+   Pull the latest image from Docker Hub or GitHub Container Registry:
+   ```bash
+   docker pull your-username/sigma-rule-generator:latest
+   ```
+   OR
+   ```bash
+   docker pull ghcr.io/your-username/sigma-rule-generator:latest
+   ```
 
-### Production Build
-- Vite builds optimized client-side assets
-- ESBuild bundles server code for Node.js
-- Static file serving from Express
-- Environment-based configuration
+2. **Run the Container**:
+   Start the container and map port 3000:
+   ```bash
+   docker run -p 3000:3000 your-username/sigma-rule-generator:latest
+   ```
+   OR
+   ```bash
+   docker run -p 3000:3000 ghcr.io/your-username/sigma-rule-generator:latest
+   ```
 
-### Database Strategy
-- Development: PostgreSQL with Drizzle migrations
-- Production: Neon Database serverless connection
-- Schema versioning through Drizzle Kit
-- Connection pooling for performance
+3. **Access the Application**:
+   Open your browser and navigate to `http://localhost:3000`.
 
-The architecture prioritizes developer experience with fast feedback loops while maintaining production readiness through TypeScript safety, optimized builds, and scalable database solutions.
+#### Option 2: Building and Running a Production Image Locally
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/your-username/sigma-rule-generator.git
+   cd sigma-rule-generator
+   ```
+
+2. **Build the Production Docker Image**:
+   Create an optimized production image using the provided Dockerfile:
+   ```bash
+   docker build -t sigma-rule-generator:prod .
+   ```
+
+3. **Run the Production Container**:
+   Start the container with the production image:
+   ```bash
+   docker run -p 3000:3000 sigma-rule-generator:prod
+   ```
+
+4. **Access the Application**:
+   Open your browser and navigate to `http://localhost:3000`.
+
+#### Configuration
+- **Environment Variables**: Customize settings such as timezone (TZ) and port (PORT) via a `.env` file. Example:
+  ```env
+  TZ=America/New_York
+  PORT=3000
+  ```
+  Place the `.env` file in the project root and reference it when running the container:
+  ```bash
+  docker run --env-file .env -p 3000:3000 sigma-rule-generator:prod
+  ```
+- **Docker Compose**: For easier configuration, use the provided `docker-compose.yml` to manage environment variables and services:
+  ```bash
+  docker-compose up -d
+  ```
+- **Scalability**: Deploy on a cloud provider or local server with Docker support. Use orchestration tools like Kubernetes for high-availability setups.
+
+## Preview
+
+**Light Theme**
+
+![light](assets/light.png)
+
+**Dark theme:**
+
+![dark](assets/dark.png)
+
+
+## Usage
+
+1. **Create a Rule**:
+   - Fill out the form with details like rule title, description, and detection logic.
+   - Use the guided fields to specify conditions, fields, and values.
+
+2. **Preview and Validate**:
+   - View the generated YAML in real-time as you fill out the form.
+   - The application ensures your rule is valid before export.
+
+3. **Export**:
+   - Click "Download" to save the rule as a `.yml` file.
+   - Use the "Copy to Clipboard" button to share or paste the rule elsewhere.
+
+## Contributing
+
+This project is open-source and welcomes contributions! To get involved:
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/your-feature`).
+3. Commit your changes (`git commit -m 'Add your feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Open a pull request.
+
+Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) and review the [Contributing Guidelines](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built with inspiration from the Sigma community and its open-source detection rule format.
+- Thanks to all contributors and users for supporting this project!
