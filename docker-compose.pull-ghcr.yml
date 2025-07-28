@@ -1,6 +1,6 @@
 services:
   sigmarulegen:
-    image: ghcr.io/05t3/sigmarulegen:${VERSION}
+    image: ghcr.io/05t3/sigmarulegen:1.0.2
     container_name: sigmarulegen
     env_file:
       - .env
