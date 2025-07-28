@@ -20,6 +20,7 @@ turbo
 # Ignore environment variables
 .env
 .env.*
+secrets.txt
 
 # Editor and OS files
 .vscode
