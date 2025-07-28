@@ -11,7 +11,7 @@ ENV TZ=Africa/Nairobi
 # Copy package files & install dependencies
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --omit=dev
 
 # Copy everything else
 COPY . .
