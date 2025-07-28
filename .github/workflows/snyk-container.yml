@@ -18,6 +18,11 @@ on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 env:
   DOCKERHUB_IMAGE: oste/sigmarulegen:1.0.0
   GHCR_IMAGE: ghcr.io/oste/sigmarulegen:1.0.0
@@ -28,69 +33,76 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker auth for DockerHub
+      - name: 📄 Read version from VERSION file
+        id: version
+        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: 🔐 Docker Login (DockerHub)
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up Docker auth for GHCR
+      - name: 🔐 Docker Login (GHCR)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Snyk CLI
-        run: |
-          npm install -g snyk
+      - name: 🧰 Install Snyk CLI
+        run: npm install -g snyk
 
-      - name: Auth Snyk
+      - name: 🔐 Authenticate Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-      # GHCR Image Scan
-      - name: Pull GHCR Image
+      # Pull and scan images
+      - name: 📦 Pull GHCR Image
         id: ghcr_pull
         run: |
-          docker pull $GHCR_IMAGE || echo "GHCR image not found"
+          IMAGE=ghcr.io/oste/sigmarulegen:${{ steps.version.outputs.version }}
+          docker pull $IMAGE || echo "GHCR image not found"
 
-      - name: Scan GHCR Image with Snyk
+      - name: 🧪 Scan GHCR Image with Snyk
         if: steps.ghcr_pull.outcome == 'success'
         run: |
-          snyk container test $GHCR_IMAGE \
+          IMAGE=ghcr.io/oste/sigmarulegen:${{ steps.version.outputs.version }}
+          snyk container test $IMAGE \
             --file=Dockerfile \
-            --sarif-file-output=snyk-ghcr.sarif || echo "Snyk GHCR scan failed"
+            --sarif-file-output=snyk-ghcr.sarif || echo "GHCR Snyk scan failed"
 
-      # DockerHub Image Scan
-      - name: Pull DockerHub Image
+      - name: 📦 Pull DockerHub Image
         id: dockerhub_pull
         run: |
-          docker pull $DOCKERHUB_IMAGE || echo "DockerHub image not found"
+          IMAGE=oste/sigmarulegen:${{ steps.version.outputs.version }}
+          docker pull $IMAGE || echo "DockerHub image not found"
 
-      - name: Scan DockerHub Image with Snyk
+      - name: 🧪 Scan DockerHub Image with Snyk
         if: steps.dockerhub_pull.outcome == 'success'
         run: |
-          snyk container test $DOCKERHUB_IMAGE \
+          IMAGE=oste/sigmarulegen:${{ steps.version.outputs.version }}
+          snyk container test $IMAGE \
             --file=Dockerfile \
-            --sarif-file-output=snyk-dockerhub.sarif || echo "Snyk DockerHub scan failed"
+            --sarif-file-output=snyk-dockerhub.sarif || echo "DockerHub Snyk scan failed"
 
-      # Upload SARIF individually
-      - name: Upload SARIF for GHCR
+      # Upload SARIFs
+      - name: ☁️ Upload SARIF for GHCR
         if: steps.ghcr_pull.outcome == 'success' && hashFiles('snyk-ghcr.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk-ghcr.sarif
           category: snyk-ghcr
 
-      - name: Upload SARIF for DockerHub
+      - name: ☁️ Upload SARIF for DockerHub
         if: steps.dockerhub_pull.outcome == 'success' && hashFiles('snyk-dockerhub.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk-dockerhub.sarif
           category: snyk-dockerhub
+
 
 
 
