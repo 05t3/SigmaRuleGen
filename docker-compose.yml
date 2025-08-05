@@ -1,10 +1,10 @@
 services:
-  sigmarulegen:
-    image: ghcr.io/05t3/sigmarulegen:${VERSION} # GHCR IMAGE
-#    image: oste/sigmarulegen:1.0.0  # DOCKERHUB IMAGE
-    container_name: sigmarulegen
+  app:
+    build:
+      context: .
     env_file:
       - .env
     ports:
-      - "${PORT}:${PORT}" # DEFINE PORT in the .env file 
+      - "${PORT}:${PORT}" # uses PORT from .env
     restart: unless-stopped
+    container_name: sigmarulegen

@@ -5,7 +5,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Set environment variables
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 
 # Copy package files & install dependencies
 COPY package*.json ./
