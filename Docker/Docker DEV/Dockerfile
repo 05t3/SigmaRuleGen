@@ -5,8 +5,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Set environment variables
-ENV NODE_ENV=${NODE_ENV}
-ENV TZ=Africa/Nairobi
+ENV NODE_ENV=production
 
 # Copy package files & install dependencies
 COPY package*.json ./
@@ -20,4 +19,5 @@ COPY . .
 EXPOSE 3000
 
 # Command can be overridden with CMD in docker-compose
-CMD ["npm", "run", "dev"]
+RUN npm ci && npm run build
+CMD ["npm", "run", "start"]

@@ -1,9 +1,10 @@
 services:
-  sigmarulegen:
-    image: ghcr.io/05t3/sigmarulegen:1.0.0
-    container_name: sigmarulegen
+  app:
+    build:
+      context: .
     env_file:
       - .env
     ports:
       - "${PORT}:${PORT}" # uses PORT from .env
     restart: unless-stopped
+    container_name: sigmarulegen

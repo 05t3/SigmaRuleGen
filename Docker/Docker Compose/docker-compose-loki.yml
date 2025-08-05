@@ -1,0 +1,34 @@
+services:
+  sigmarulegen:
+    image: ghcr.io/05t3/sigmarulegen:${VERSION} # GHCR IMAGE
+#    image: oste/sigmarulegen:1.0.0  # DOCKERHUB IMAGE
+    container_name: sigmarulegen
+    env_file:
+      - .env
+    restart: unless-stopped
+
+###############################################################
+#                       TRAEFIK LABELS                        #
+###############################################################
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.deluge.rule=Host(`deluge.example.org`)"
+      - "traefik.http.routers.deluge.entrypoints=https"
+      - "traefik.http.routers.deluge.service=deluge"
+      - "traefik.http.routers.deluge.tls=true"
+      - "traefik.http.routers.deluge.tls.certresolver=cloudflare"
+      - "traefik.http.services.deluge.loadbalancer.server.port=${PORT}"
+
+###############################################################
+#                       LOGGING WITH LOKI                     #
+###############################################################
+    logging:
+      driver: loki
+      options:
+        loki-url: "https://loki.example.org/loki/api/v1/push"
+        loki-retries: 2
+        loki-max-backoff: 800ms
+        loki-timeout: 1s
+        keep-file: "true"
+        mode: "non-blocking"
